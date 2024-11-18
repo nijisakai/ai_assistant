@@ -55,3 +55,10 @@ This project provides a chat assistant interface that collects and stores user i
 - **Empty CSV**: Ensure interaction data is sent upon closing the chat or browser.
 - **Network Issues**: Check console logs for network errors.
 - **UTF-8 Encoding**: Ensure CSV writes with UTF-8 to prevent text encoding issues.
+
+
+## Demo
+
+![alt text](image-1.png)
+![alt text](image-2.png)
+![alt text](image.png)
