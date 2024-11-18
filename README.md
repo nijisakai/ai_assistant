@@ -30,7 +30,7 @@ This project provides a chat assistant interface that collects and stores user i
 
 3. **Install Dependencies**:
    ```bash
-   npm install express
+   npm install express cors
    ```
 
 4. **Run the Servers**:

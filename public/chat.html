@@ -140,7 +140,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function callApi(userMessage) {
-        const jwt = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2MmY3M2JiLWY3YTgtNDRiMy1hNzZkLTNlMjE1NzIwMzEyMCJ9.VXj_GWPVoJ3bLkbiuPhxvH5qpLiDAgpQnNNXWxokcdEYOUR_JWT_TOKEN';
+        const jwt = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2MmY3M2JiLWY3YTgtNDRiMy1hNzZkLTNlMjE1NzIwMzEyMCJ9.VXj_GWPVoJ3bLkbiuPhxvH5qpLiDAgpQnNNXWxokcdE';
 
         fetch('http://39.107.81.179/api/chat/completions', {
             method: 'POST',
@@ -174,7 +174,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function saveInteraction() {
         interactionData.endTime = new Date().toISOString();
 
-        fetch('http://localhost:3000/save-interaction', {
+        fetch('http://192.168.3.58:3000/save-interaction', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
