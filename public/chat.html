@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Interface</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+        #chat-icon {
+            display: block;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            cursor: pointer;
+            z-index: 1001;
+        }
+        #chat-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 320px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+            background-color: #fff;
+            z-index: 1000;
+            display: none;
+        }
+        #chat-header {
+            background-color: #007bff;
+            color: white;
+            padding: 10px;
+            border-radius: 8px 8px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        #close-chat {
+            cursor: pointer;
+        }
+        #chat-body {
+            padding: 10px;
+            height: 300px;
+            overflow-y: auto;
+            border-top: 1px solid #ccc;
+        }
+        .message {
+            margin-bottom: 10px;
+        }
+        .user-message {
+            text-align: right;
+            margin-right: 20px;
+            background-color: #DCF8C6;
+            padding: 5px;
+            border-radius: 5px 5px 0 5px;
+        }
+        .assistant-message {
+            text-align: left;
+            margin-left: 20px;
+            background-color: #e9e9e9;
+            padding: 5px;
+            border-radius: 5px 5px 5px 0;
+        }
+        #chat-input {
+            width: calc(100% - 70px);
+            border: 1px solid #ccc;
+            padding: 10px;
+        }
+        #send-button {
+            width: 60px;
+            border: none;
+            padding: 10px;
+            background-color: #007bff;
+            color: #fff;
+            cursor: pointer;
+        }
+        #chat-footer {
+            display: flex;
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div id="chat-icon" class="fas fa-comment-dots fa-2x"></div>
+<div id="chat-container">
+    <div id="chat-header">
+        Chat Assistant
+        <span id="close-chat" class="fas fa-times"></span>
+    </div>
+    <div id="chat-body"></div>
+    <div id="chat-footer">
+        <input type="text" id="chat-input" placeholder="Type a message...">
+        <button id="send-button">Send</button>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const chatIcon = document.getElementById('chat-icon');
+    const chatContainer = document.getElementById('chat-container');
+    const closeChat = document.getElementById('close-chat');
+    const chatInput = document.getElementById('chat-input');
+    const sendButton = document.getElementById('send-button');
+
+    const interactionData = {
+        messages: [],
+        startTime: null,
+        endTime: null
+    };
+
+    function toggleChatWindow() {
+        const isOpen = chatContainer.style.display === 'block';
+        chatContainer.style.display = isOpen ? 'none' : 'block';
+        chatIcon.style.display = isOpen ? 'block' : 'none';
+
+        if (!isOpen && !interactionData.startTime) {
+            interactionData.startTime = new Date().toISOString();
+        }
+    }
+
+    function sendMessage() {
+        const message = chatInput.value.trim();
+        if (!message) return;
+
+        const timestamp = new Date().toISOString();
+        interactionData.messages.push({ sender: 'user', message, timestamp });
+        displayMessage('user', message);
+        chatInput.value = '';
+        callApi(message);
+    }
+
+    function displayMessage(role, message) {
+        const chatBody = document.getElementById('chat-body');
+        const messageElement = document.createElement('div');
+        messageElement.classList.add('message', role === 'user' ? 'user-message' : 'assistant-message');
+        messageElement.textContent = message;
+        chatBody.appendChild(messageElement);
+        chatBody.scrollTop = chatBody.scrollHeight;
+    }
+
+    function callApi(userMessage) {
+        const jwt = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2MmY3M2JiLWY3YTgtNDRiMy1hNzZkLTNlMjE1NzIwMzEyMCJ9.VXj_GWPVoJ3bLkbiuPhxvH5qpLiDAgpQnNNXWxokcdEYOUR_JWT_TOKEN';
+
+        fetch('http://39.107.81.179/api/chat/completions', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${jwt}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                model: 'bot-7425949648768466984',
+                messages: [{ role: 'user', content: userMessage }]
+            })
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            const assistantMessage = data.choices[0].message.content;
+            const timestamp = new Date().toISOString();
+            interactionData.messages.push({ sender: 'assistant', message: assistantMessage, timestamp });
+            displayMessage('assistant', assistantMessage);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            displayMessage('assistant', 'Sorry, an error occurred while processing your message.');
+        });
+    }
+
+    function saveInteraction() {
+        interactionData.endTime = new Date().toISOString();
+
+        fetch('http://localhost:3000/save-interaction', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(interactionData)
+        }).then(response => response.json()).then(data => {
+            console.log('Data saved successfully:', data);
+        }).catch(error => {
+            console.error('Error saving data:', error);
+        });
+    }
+
+    chatIcon.addEventListener('click', toggleChatWindow);
+    closeChat.addEventListener('click', function () {
+        toggleChatWindow();
+        saveInteraction();
+    });
+
+    window.addEventListener('beforeunload', saveInteraction);
+
+    sendButton.addEventListener('click', sendMessage);
+    chatInput.addEventListener('keypress', function (event) {
+        if (event.key === 'Enter') {
+            sendMessage();
+        }
+    });
+});
+</script>
+
+</body>
+</html>
