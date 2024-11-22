@@ -6,7 +6,7 @@ This project provides a chat assistant interface that collects and stores user i
 
 ## Project Structure
 
-```
+``` bash
 /project-root
 │-- /public
 │   └-- chat.html
@@ -29,11 +29,13 @@ This project provides a chat assistant interface that collects and stores user i
 2. **Clone the Repository**: Download or clone the project files.
 
 3. **Install Dependencies**:
+
    ```bash
    npm install express cors
    ```
 
 4. **Run the Servers**:
+
    ```bash
    node server.js
    ```
@@ -55,7 +57,6 @@ This project provides a chat assistant interface that collects and stores user i
 - **Empty CSV**: Ensure interaction data is sent upon closing the chat or browser.
 - **Network Issues**: Check console logs for network errors.
 - **UTF-8 Encoding**: Ensure CSV writes with UTF-8 to prevent text encoding issues.
-
 
 ## Demo
 
